@@ -34,8 +34,8 @@ public class PubSub {
     static short port = 8883;
     static String clientId = "sdk-java";
     static String endpoint = "a3j5gn8c1p7i99-ats.iot.us-east-1.amazonaws.com";
-    static String input_cert = "C:\\Users\\Salem\\Downloads\\Compressed\\aws-iot-device-sdk-java-v2-main\\samples\\BasicPubSub\\src\\main\\java\\pubsub\\phone.cert.pem";
-    static String input_key = "C:\\Users\\Salem\\Downloads\\Compressed\\aws-iot-device-sdk-java-v2-main\\samples\\BasicPubSub\\src\\main\\java\\pubsub\\phone.private.key";
+    static String input_cert = "src/main/java/pubsub/phone.cert.pem";
+    static String input_key = "src/main/java/pubsub/phone.private.key";
 
     static String topic = "sdk/test/java";
     static int count = 5;
@@ -111,8 +111,8 @@ public class PubSub {
             subscribed.get();
 
             // Publish to the topic
-            int count = 0;
-            while (count++ < count) {
+            int count2 = 0;
+            while (count2++ < count) {
                 CompletableFuture<Integer> published = connection.publish(new MqttMessage(topic, message.getBytes(), QualityOfService.AT_LEAST_ONCE, false));
                 published.get();
                 Thread.sleep(1000);
