@@ -5,6 +5,8 @@ package pubsub;
  */
 
 
+import org.json.JSONObject;
+import software.amazon.awssdk.aws.greengrass.model.JsonMessage;
 import software.amazon.awssdk.crt.CRT;
 import software.amazon.awssdk.crt.CrtResource;
 import software.amazon.awssdk.crt.CrtRuntimeException;
@@ -32,15 +34,15 @@ public class PubSub {
 
     ///
     static short port = 8883;
-    static String clientId = "sdk-java";
+    static String clientId = "phone";
     static String endpoint = "a3j5gn8c1p7i99-ats.iot.us-east-1.amazonaws.com";
     static String input_cert = "src/main/java/pubsub/phone.cert.pem";
     static String input_key = "src/main/java/pubsub/phone.private.key";
 
-    static String topic = "sdk/test/java";
-    static int count = 5;
+    static String topic = "/iot/temp";
+    static String topic_alert = "/iot/temp_alert";
+    static int count = 1;
 
-    static String message = "This is my connection";
     /*
      * When called during a CI run, throw an exception that will escape and fail the exec:java task
      * When called otherwise, print what went wrong (if anything) and just continue (return from main)
@@ -55,11 +57,9 @@ public class PubSub {
 
     public static void main(String[] args) {
 
-        /**
-         * cmdData is the arguments/input from the command line placed into a single struct for
-         * use in this sample. This handles all of the command line parsing, validating, etc.
-         * See the Utils/CommandLineUtils for more information.
-         */
+        //defines the json msg
+        JSONObject jo = new JSONObject();
+        jo.put("temperature", 60);
 
         MqttClientConnectionEvents callbacks = new MqttClientConnectionEvents() {
             @Override
@@ -103,7 +103,7 @@ public class PubSub {
 
             // Subscribe to the topic
             CountDownLatch countDownLatch = new CountDownLatch(count);
-            CompletableFuture<Integer> subscribed = connection.subscribe(topic, QualityOfService.AT_LEAST_ONCE, (message) -> {
+            CompletableFuture<Integer> subscribed = connection.subscribe(topic_alert, QualityOfService.AT_LEAST_ONCE, (message) -> {
                 String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
                 System.out.println("MESSAGE: " + payload);
                 countDownLatch.countDown();
@@ -113,7 +113,7 @@ public class PubSub {
             // Publish to the topic
             int count2 = 0;
             while (count2++ < count) {
-                CompletableFuture<Integer> published = connection.publish(new MqttMessage(topic, message.getBytes(), QualityOfService.AT_LEAST_ONCE, false));
+                CompletableFuture<Integer> published = connection.publish(new MqttMessage(topic, jo.toString().getBytes(), QualityOfService.AT_LEAST_ONCE, false));
                 published.get();
                 Thread.sleep(1000);
             }
